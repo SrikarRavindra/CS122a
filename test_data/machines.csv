@@ -1,0 +1,6 @@
+1,gpu1,192.168.10.1,Active,DBH 1001
+2,gpu2,192.168.10.2,Active,DBH 1002
+3,gpu3,192.168.10.3,Down,DBH 1001
+4,compute1,192.168.20.1,Active,DBH 3001
+5,compute2,192.168.20.2,Down,DBH 3002
+6,compute3,192.168.20.3,Active,DBH 3003
