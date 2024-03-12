@@ -172,6 +172,53 @@ def addEmail(UCINetID, email):
     except mysql.connector.errors.IntegrityError as e:
         conn.rollback()
         print("Fail")
+        
+# Function 4
+def delete_student(UCInetID: str):
+
+    # execute queries for deleting
+    cursor.execute("DELETE FROM students WHERE student_id = %s", (UCInetID,))
+    cursor.execute("DELETE FROM users WHERE UCInetID = %s", (UCInetID))
+
+    #commit changes to tables
+    conn.commit()
+
+    #if it no longer exists pri
+    if cursor.rowcount > 0:
+        print("Sucess")
+    else:
+        print("Fail")
+
+#Function 5
+def insert_machine(MachineID, hostname, IPAddr, status, location):
+    dll = '''
+            INSERT INTO machines (machine_id, name, IP_address, operational_status, location)
+            VALUES (%s, %s, %s, %s, %s)
+        '''
+    
+    cursor.execute(dll, (MachineID, hostname, IPAddr, status, location))
+    
+    conn.commit()
+
+    if cursor.rowcount > 0:
+        print("Success")
+    else:
+        print("Fail")
+
+#Function 6
+def insert_use(ProjId, UCInetID, MachineID, Start, End):
+    dll = """
+            INSERT INTO used (project_id, UCINetID, machine_id, start_date, end_date)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+    cursor.execute(dll, (ProjId, UCInetID, MachineID, Start, End))
+
+    conn.commit()
+
+    if cursor.rowcount > 0:
+        print("Success")
+    else:
+        print("Fail")
 
 if __name__ == '__main__':
     #print(sys.argv[1].lower())
@@ -207,3 +254,12 @@ if __name__ == '__main__':
     if(sys.argv[1].lower() == 'addemail'):
         (UCINetID, email) = (sys.argv[2], sys.argv[3])
         addEmail(UCINetID, email)
+
+    if(sys.argv[1].lower() == 'deletestudent'):
+        delete_student(sys.argv[2])
+    
+    if(sys.argv[1].lower() == 'insertmachine'):
+        insert_machine(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+
+    if(sys.arv[1].lower() ==  'insertuse'):
+        insert_use(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
