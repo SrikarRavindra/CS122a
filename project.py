@@ -68,6 +68,8 @@ def import_data(folder_name):
     #cursor.close()
     print(f'{user_count},{machine_count},{course_count}')
 
+
+
 def find_popular_course(count):
     dll =  dll = f"select c.course_id, c.title,  count(distinct u.UCINetID) as numStudents from courses as c join projects as p on c.course_id = p.course_id join used as u on p.project_id = u.project_id group by c.course_id, c.title order by numStudents desc limit {count};"
     cursor.execute(dll)
@@ -130,11 +132,52 @@ GROUP BY u.UCINetID;
     for(UCINetID, FirstName, MiddleName, LastName, mailingList) in result:
         print(f"{UCINetID},{FirstName},{MiddleName},{LastName},{mailingList}")
 
+
+def insertStudent(UCINetID, email, FirstName, MiddleName, LastName):
+    try:
+        insert_user = f'''
+            INSERT INTO users (UCINetID, FirstName, MiddleName, LastName)
+            VALUES ('{UCINetID}', '{FirstName}', '{MiddleName}', '{LastName}');
+        '''
+        insert_email = f'''
+            INSERT INTO emails (UCINetID, email_address)
+            VALUES ('{UCINetID}', '{email}');
+        '''
+        insert_student = f'''
+            INSERT INTO students (student_id)
+            VALUES ('{UCINetID}');
+        '''
+        with conn.cursor() as cursor:
+            cursor.execute(insert_user)
+            cursor.execute(insert_email)
+            cursor.execute(insert_student)
+        conn.commit()
+        print("Success")
+        return True
+    except mysql.connector.errors.IntegrityError as e:
+        conn.rollback()
+        print("Fail")
+        return False
+
+def addEmail(UCINetID, email):
+    dll = f'''
+        INSERT INTO emails (UCINetID, email_address)
+        VALUES ('{UCINetID}', '{email}');
+    '''
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(dll)
+        conn.commit()
+        print("Success")
+    except mysql.connector.errors.IntegrityError as e:
+        conn.rollback()
+        print("Fail")
+
 if __name__ == '__main__':
     #print(sys.argv[1].lower())
     conn = mysql.connector.connect(
         user = 'test',
-        #user = 'root',
+        # user = 'root',
         password = 'password',
         database = 'cs122a'
     )
@@ -156,3 +199,11 @@ if __name__ == '__main__':
     
     if(sys.argv[1].lower() == 'adminemails'):
         find_admin_emails(sys.argv[2])
+
+    if(sys.argv[1].lower() == 'insertstudent'):
+        (UCINetID, email, FirstName, MiddleName, LastName) = (sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+        insertStudent(UCINetID, email, FirstName, MiddleName, LastName)
+
+    if(sys.argv[1].lower() == 'addemail'):
+        (UCINetID, email) = (sys.argv[2], sys.argv[3])
+        addEmail(UCINetID, email)
