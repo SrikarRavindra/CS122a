@@ -164,13 +164,14 @@ def addEmail(UCINetID, email):
         INSERT INTO emails (UCINetID, email_address)
         VALUES ('{UCINetID}', '{email}');
     '''
-    with conn.cursor() as cursor:
-        cursor.execute(dll)
-    conn.commit()
-    if cursor.rowcount == 0:
-        print("Fail")
-    else:
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(dll)
+        conn.commit()
         print("Success")
+    except mysql.connector.errors.IntegrityError as e:
+        conn.rollback()
+        print("Fail")
 
 if __name__ == '__main__':
     #print(sys.argv[1].lower())
